@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+
+group 'me.alien.networking'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.json:json:20220320'
+}
