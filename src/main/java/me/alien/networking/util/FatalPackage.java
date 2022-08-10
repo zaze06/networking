@@ -1,23 +1,25 @@
-package me.alien.networking.util.packages;
+package me.alien.networking.util;
+
+import java.io.Serializable;
 
 /**
- * A {@link NetworkPackage} that contains a fatal information
+ * A {@link Serializable} that contains a fatal information
  * @author Zacharias Zellén
  */
-public class FatalPackage extends NetworkPackage{
+public class FatalPackage implements Serializable {
     /**
      * The reason for the fatal issue
      */
-    public final String reason;
+    private final String reason;
     /**
      * the error that created the fatal issue
      */
-    public final String error;
+    private final String error;
 
     /**
      * a standard constructor to store the reason and error as {@link String}s in the Fatal error class
-     * @param reason
-     * @param error
+     * @param reason the reason or exception that cased the fatal issue
+     * @param error the description of way this fatal issue happened
      */
     public FatalPackage(String reason, String error) {
         this.reason = reason;
@@ -34,5 +36,20 @@ public class FatalPackage extends NetworkPackage{
                 "reason='" + reason + '\'' +
                 ", error='" + error + '\'' +
                 '}';
+    }
+
+    /**
+     * gives the error that {@link FatalPackage} contains
+     * @return {@link #error}
+     */
+    public String getError() {
+        return error;
+    }
+    /**
+     * gives the reason that {@link FatalPackage} contains
+     * @return {@link #reason}
+     */
+    public String getReason() {
+        return reason;
     }
 }

@@ -3,9 +3,7 @@ package me.alien.networking.client;
 import me.alien.networking.server.Server;
 import me.alien.networking.util.Headers;
 import me.alien.networking.util.Logger;
-import me.alien.networking.util.packages.FatalPackage;
-import me.alien.networking.util.packages.MessagePackage;
-import me.alien.networking.util.packages.NetworkPackage;
+import me.alien.networking.util.FatalPackage;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -27,7 +25,7 @@ abstract public class Client {
     final Socket socket;
 
     /**
-     * The {@link Thread} that make sure that the received messages get handed in {@link #messageReceive(NetworkPackage, boolean)}
+     * The {@link Thread} that make sure that the received messages get handed in {@link #messageReceive(Serializable, boolean)}
      */
     private final MessageReceiveThread messageReceiveThread;
 
@@ -92,11 +90,11 @@ abstract public class Client {
     }
 
     /**
-     * {@link #messageReceive(NetworkPackage, boolean)} gets called when {@link #messageReceiveThread} receives a new message
-     * @param message A class that will contain the information of the information <br> example can be {@link MessagePackage} which will contain {@link MessagePackage#message} that is a raw {@link String} message.
+     * {@link #messageReceive(Serializable, boolean)} gets called when {@link #messageReceiveThread} receives a new message
+     * @param message A class that needs to implument {@link Serializable} to contain some sort of data. see examples package
      * @param fatal If this is {@code true} then the connection will be closed directly after this method is complete. If its {@code true} then the message will be a {@link FatalPackage} and it will contain a {@link FatalPackage#reason} and {@link FatalPackage#error} that will describe the issue
      */
-    public abstract void messageReceive(NetworkPackage message, boolean fatal);
+    public abstract void messageReceive(Serializable message, boolean fatal);
 
     /**
      * {@link #connected()} will be called when it's done with the initial handshake hear its possible to do some second hand handshake to confirm more information
@@ -104,7 +102,7 @@ abstract public class Client {
     public abstract void connected();
 
     /**
-     * The {@link MessageReceiveThread} is a {@link Thread} that will make sure all receive packages will be sent to {@link #messageReceive(NetworkPackage, boolean)}
+     * The {@link MessageReceiveThread} is a {@link Thread} that will make sure all receive packages will be sent to {@link #messageReceive(Serializable, boolean)}
      * @author Zacharias Zellén
      */
     private class MessageReceiveThread extends Thread {
@@ -118,7 +116,7 @@ abstract public class Client {
                 while(true){
                     ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
                     try{
-                        NetworkPackage message = (NetworkPackage) in.readObject();
+                        Serializable message = (Serializable) in.readObject();
                         boolean fatal = false;
                         if(message instanceof FatalPackage){
                             fatal = true;

@@ -1,10 +1,7 @@
 package me.alien.networking.server;
 
-import me.alien.networking.util.Headers;
 import me.alien.networking.util.Logger;
-import me.alien.networking.util.packages.FatalPackage;
-import me.alien.networking.util.packages.NetworkPackage;
-import org.json.JSONObject;
+import me.alien.networking.util.FatalPackage;
 
 import java.io.*;
 import java.net.Socket;
@@ -23,7 +20,7 @@ public class Client {
      */
     private final Server server;
     /**
-     * {@link MessageReceiveThread} is a {@link Thread} that will send the recived messages to {@link Server#clientMessage(Client, NetworkPackage, boolean)}
+     * {@link MessageReceiveThread} is a {@link Thread} that will send the recived messages to {@link Server#clientMessage(Client, Serializable, boolean)}
      */
     private final MessageReceiveThread messageReciveThread;
     /**
@@ -50,15 +47,15 @@ public class Client {
 
     /**
      * This will send the message to {@link me.alien.networking.client.Client} that it's connected too.
-     * @param message An object that extends the {@link NetworkPackage} to be sent
+     * @param message An object that implements the {@link Serializable} to be sent
      * @throws IOException If the {@link Socket#getOutputStream()}s {@link OutputStream} throws a IOException
      */
-    public <T extends NetworkPackage> void send(T message) throws IOException {
+    public void send(Serializable message) throws IOException {
         out.writeObject(message);
     }
 
     /**
-     * {@link MessageReceiveThread} is the {@link Thread} that is responsible for sending the received message to {@link Server#clientMessage(Client, NetworkPackage, boolean)}
+     * {@link MessageReceiveThread} is the {@link Thread} that is responsible for sending the received message to {@link Server#clientMessage(Client, Serializable, boolean)}
      * @author Zacharias Zellén
      */
     private class MessageReceiveThread extends Thread {
@@ -71,7 +68,7 @@ public class Client {
                 while(true){
                     ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
                     try{
-                        NetworkPackage message = (NetworkPackage) in.readObject();
+                        Serializable message = (Serializable) in.readObject();
                         boolean fatal = false;
                         if(message instanceof FatalPackage){
                             fatal = true;
