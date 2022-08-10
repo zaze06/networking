@@ -1,6 +1,7 @@
 package me.alien.networking.server;
 
 import me.alien.networking.util.Logger;
+import me.alien.networking.util.packages.NetworkPackage;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -75,5 +76,5 @@ abstract public class Server {
      * @param fatal if this was a fatal message, meaning that the client experienced a fatal issue and needs to have the connection closed.
      *              If fatal is true then the connection will be closed afterwords.
      */
-    public abstract void clientMessage(Client client, String message, boolean fatal);
+    public abstract void clientMessage(Client client, NetworkPackage message, boolean fatal);
 }

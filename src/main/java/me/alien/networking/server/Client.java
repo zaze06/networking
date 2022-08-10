@@ -2,12 +2,11 @@ package me.alien.networking.server;
 
 import me.alien.networking.util.Headers;
 import me.alien.networking.util.Logger;
+import me.alien.networking.util.packages.FatalPackage;
+import me.alien.networking.util.packages.NetworkPackage;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.Socket;
 
 public class Client {
@@ -16,7 +15,7 @@ public class Client {
     private Client client;
     private final MessageReceiveThread messageReciveThread;
 
-    private PrintStream out;
+    private ObjectOutputStream out;
     public Client(Socket client, Server server) {
         this.socket = client;
         this.server = server;
@@ -24,14 +23,14 @@ public class Client {
         messageReciveThread.start();
         this.client = this;
         try {
-            this.out = new PrintStream(client.getOutputStream(), true);
+            this.out = new ObjectOutputStream(client.getOutputStream());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void send(String message){
-        out.println(message);
+    public <T extends NetworkPackage> void send(T message) throws IOException {
+        out.writeObject(message);
     }
 
     private class MessageReceiveThread extends Thread {
@@ -39,11 +38,11 @@ public class Client {
         public void run() {
             try{
                 while(true){
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
                     try{
-                        String message = in.readLine();
+                        NetworkPackage message = (NetworkPackage) in.readObject();
                         boolean fatal = false;
-                        if(message.startsWith(Headers.FATAL.getHeader()+"")){
+                        if(message instanceof FatalPackage){
                             fatal = true;
                         }
                         server.clientMessage(client, message, fatal);
@@ -51,14 +50,16 @@ public class Client {
                         if(socket.isClosed()){
                             Logger.warn(getClass(), "IOException accused");
                             Logger.exception(getClass(), ignored.getStackTrace());
-                            server.clientMessage(client, Headers.FATAL.getHeader()+(new JSONObject().put("reason", "Connected closed, assuming lost of connection to client").toString()), true);
+                            server.clientMessage(client, new FatalPackage("Connected closed, assuming lost of connection to client", "connection lost"), true);
                         }
+                    } catch (ClassNotFoundException e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }catch (IOException ignored){
                 Logger.warn(getClass(), "IOException accused");
                 Logger.exception(getClass(), ignored.getStackTrace());
-                server.clientMessage(client, Headers.FATAL.getHeader()+(new JSONObject().put("reason", "Failed to create a BufferedReader instance of the sockets InputStream instance").toString()), true);
+                server.clientMessage(client, new FatalPackage("Failed to create a ObjectOutputStream instance of the sockets InputStream instance", "Socket not opened?"), true);
             }
         }
     }
