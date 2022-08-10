@@ -16,4 +16,4 @@
     3. reload maven
 - If your build system or this dodent work follow the instructions on [jitpack](https://jitpack.io/#zaze06/networking)
 
-#### Javadoc can be found at [releases](https://github.com/zaze06/networking/releases/latest) in the `javadoc.zip`
+#### Javadoc can be found at [hear](https://zaze06.github.io/networking/index.html) or in [docs](https://github.com/zaze06/networking/tree/master/docs) folder
