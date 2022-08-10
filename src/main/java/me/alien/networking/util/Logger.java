@@ -4,6 +4,10 @@ import me.alien.networking.server.Client;
 
 import java.util.Arrays;
 
+/**
+ * Logger are used to give a more specified information and the class that sent it
+ * @author Zacharias Zellén
+ */
 public class Logger {
     /**
      * A method to print out which class that is doing what

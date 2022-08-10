@@ -1,12 +1,19 @@
 package me.alien.networking.util;
 
+import me.alien.networking.client.Client;
+import me.alien.networking.server.Server;
+
+/**
+ * Headers are used for handshake conversation of the start when connection a {@link Client} and {@link Server}
+ * @author Zacharias Zellén
+ */
 public enum Headers {
     /**
      * A starter header for first contact to the client.
      */
     START(' '),
     /**
-     * Fatal issue have a cured and the socket need to be closed this should be followed by a json containing the reason.
+     * Fatal issue have occurred and the socket needs to be closed this should be followed by a json containing the reason.
      */
     FATAL('!'),
     /**
@@ -22,7 +29,7 @@ public enum Headers {
      */
     ERROR('~');
     /**
-     * A chat that is resposible for the {@link Headers} indicator
+     * A chat that is responsible for the {@link Headers} indicator
      */
     final char header;
 

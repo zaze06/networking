@@ -17,7 +17,7 @@ import java.net.Socket;
  */
 abstract public class Client {
     /**
-     * The version of networking communication used for handshake. </rb>
+     * The version of networking communication used for handshake. <br>
      * If you have your own version or other things needed to be completed use {@link #connected()} and {@link Server#newClient} to confirm other versions before completion the handshake
      */
     public final int VERSION = 0;
