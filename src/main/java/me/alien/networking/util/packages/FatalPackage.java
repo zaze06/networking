@@ -1,8 +1,8 @@
 package me.alien.networking.util.packages;
 
 public class FatalPackage extends NetworkPackage{
-    String reason = "";
-    String error = "";
+    public final String reason;
+    public final String error;
 
     public FatalPackage(String ression, String error) {
         this.reason = ression;

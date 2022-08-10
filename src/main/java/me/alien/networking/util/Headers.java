@@ -18,28 +18,26 @@ public enum Headers {
      */
     SUCCESS('#'),
     /**
-     * Sending of a string message.
-     */
-    MESSAGE_RAW('$'),
-    /**
-     * This should be followed by an object following by a {@link ObjectPacker}s packaging format
-     */
-    DATA('%'),
-    /**
-     * This specific an end of a Field declaration in a {@link ObjectPacker}s packing format
-     */
-    END_OF_FIELD('&'),
-    START_OF_OBJECT_CLASS('`'),
-    END_OF_OBJECT_CLASS('('),
-    /**
      * This should be followed by an error json container the error and a reason.
      */
     ERROR('~');
+    /**
+     * A chat that is resposible for the {@link Headers} indicator
+     */
     final char header;
+
+    /**
+     * Constructor of the {@link Headers}
+     * @param header the cherecter that is the id of this {@link Headers} instance
+     */
     Headers(char header){
         this.header = header;
     }
 
+    /**
+     * returns the {@link #header} of the {@link Headers} instance
+     * @return the {@link #header} of the {@link Headers} instance
+     */
     public char getHeader() {
         return header;
     }

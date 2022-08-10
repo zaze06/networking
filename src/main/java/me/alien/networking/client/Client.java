@@ -1,20 +1,42 @@
 package me.alien.networking.client;
 
+import me.alien.networking.server.Server;
 import me.alien.networking.util.Headers;
 import me.alien.networking.util.Logger;
 import me.alien.networking.util.packages.FatalPackage;
+import me.alien.networking.util.packages.MessagePackage;
 import me.alien.networking.util.packages.NetworkPackage;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * {@link Client} is the main client class for the networking and will connect to a {@link Server}
+ * @author Zacharias Zellén
+ */
 abstract public class Client {
+    /**
+     * The version of networking communication used for handshake. </rb>
+     * If you have your own version or other things needed to be completed use {@link #connected()} and {@link Server#newClient} to confirm other versions before completion the handshake
+     */
     public final int VERSION = 0;
-    Socket socket;
+    /**
+     * The {@link Socket} that is connected to the {@link Server}
+     */
+    final Socket socket;
 
+    /**
+     * The {@link Thread} that make sure that the received messages get handed in {@link #messageReceive(NetworkPackage, boolean)}
+     */
     private final MessageReceiveThread messageReceiveThread;
 
+    /**
+     * Base constructor of the {@link Client} class.<br> When this is called it will connect to the {@link Server} through the ip and port.
+     * @param ip IP to the {@link Server}
+     * @param port Port to the {@link Server}
+     * @throws IOException If the {@link Socket} failed to be created or unable to create a {@link PrintStream} or {@link BufferedReader}
+     */
     public Client(String ip, int port) throws IOException {
         this.socket = new Socket(ip, port);
         this.messageReceiveThread = new MessageReceiveThread();
@@ -59,15 +81,37 @@ abstract public class Client {
         connected();
     }
 
+    /**
+     * Base constructor of the {@link Client} class.<br> When this is called it will connect to the {@link Server} through the ip and default port. <br>
+     * this will call {@link #Client(String ip, int port)} with the default port 6550
+     * @param ip IP to the {@link Server}
+     * @throws IOException If the {@link Socket} failed to be created or unable to create a {@link PrintStream} or {@link BufferedReader}
+     */
     public Client(String ip) throws IOException {
         this(ip, 6550);
     }
 
+    /**
+     * {@link #messageReceive(NetworkPackage, boolean)} gets called when {@link #messageReceiveThread} receives a new message
+     * @param message A class that will contain the information of the information <br> example can be {@link MessagePackage} which will contain {@link MessagePackage#message} that is a raw {@link String} message.
+     * @param fatal If this is {@code true} then the connection will be closed directly after this method is complete. If its {@code true} then the message will be a {@link FatalPackage} and it will contain a {@link FatalPackage#reason} and {@link FatalPackage#error} that will describe the issue
+     */
     public abstract void messageReceive(NetworkPackage message, boolean fatal);
+
+    /**
+     * {@link #connected()} will be called when it's done with the initial handshake hear its possible to do some second hand handshake to confirm more information
+     */
     public abstract void connected();
 
+    /**
+     * The {@link MessageReceiveThread} is a {@link Thread} that will make sure all receive packages will be sent to {@link #messageReceive(NetworkPackage, boolean)}
+     * @author Zacharias Zellén
+     */
     private class MessageReceiveThread extends Thread {
 
+        /**
+         * A method inherited from {@link Thread#run()} that will be run in a different thread to not stale up the main thread
+         */
         @Override
         public void run() {
             try{

@@ -10,17 +10,27 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 
+/**
+ * The {@link Thread} that's resposible for allowing new {@link me.alien.networking.client.Client}s and doing an initial handshake
+ * @author Zacharias Zellén
+ */
 public class ClientAcceptThread extends Thread{
+    /**
+     * The {@link Server} instance that the {@link ClientAcceptThread} is working whit
+     */
     Server server;
 
     /**
-     * Creates a ClientAcceptThread instance to work with a Server instance
-     * @param server A Server instance to listen to work whit
+     * Creates a {@link ClientAcceptThread} instance to work with a {@link Server} instance
+     * @param server A Server {@link Server} to listen to work whit
      */
     public ClientAcceptThread(Server server) {
         this.server = server;
     }
 
+    /**
+     * A method inharited from {@link Thread#run()} that is started in a sepret thread to not stall the main thread
+     */
     @Override
     public void run() {
         while (true){

@@ -7,13 +7,31 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
+/**
+ * The main class for the Server
+ * @author Zacharias Zellén
+ */
 abstract public class Server {
+    /**
+     * The version of networking communication used for handshake. </rb>
+     * If you have your own version or other things needed to be completed use {@link me.alien.networking.client.Client#connected()} and {@link #newClient(Client)} to confirm other versions before completion the handshake
+     */
     final int VERSION = 0;
+    /**
+     * A {@link ServerSocket} that will be the server to connect the {@link me.alien.networking.client.Client} to
+     */
     final ServerSocket server;
+    /**
+     * The accept thread for clients. This will handle the initial handshake
+     */
     private final ClientAcceptThread clientAcceptThread;
-
+    /**
+     * A list of all the connected {@link Client}s
+     */
     final ArrayList<Client> clients;
-
+    /**
+     * The port that the server is listening too
+     */
     public final int port;
 
     /**
