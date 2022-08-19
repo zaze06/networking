@@ -30,6 +30,11 @@ abstract public class Client {
     private final MessageReceiveThread messageReceiveThread;
 
     /**
+     * The {@link OutputStream} that will send message to the {@link me.alien.networking.client.Client}
+     */
+    private ObjectOutputStream out;
+
+    /**
      * Base constructor of the {@link Client} class.<br> When this is called it will connect to the {@link Server} through the ip and port.
      * @param ip IP to the {@link Server}
      * @param port Port to the {@link Server}
@@ -100,6 +105,15 @@ abstract public class Client {
      * {@link #connected()} will be called when it's done with the initial handshake hear its possible to do some second hand handshake to confirm more information
      */
     public abstract void connected();
+
+    /**
+     * This will send the message to {@link me.alien.networking.server.Server} that it's connected too.
+     * @param message An object that implements the {@link Serializable} to be sent
+     * @throws IOException If the {@link Socket#getOutputStream()}'s {@link OutputStream} throws a IOException
+     */
+    public void send(Serializable message) throws IOException {
+        out.writeObject(message);
+    }
 
     /**
      * The {@link MessageReceiveThread} is a {@link Thread} that will make sure all receive packages will be sent to {@link #messageReceive(Serializable, boolean)}
