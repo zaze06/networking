@@ -1,6 +1,7 @@
 package me.alien.networking.client;
 
 import me.alien.networking.server.Server;
+import me.alien.networking.util.ExitPackage;
 import me.alien.networking.util.Headers;
 import me.alien.networking.util.Logger;
 import me.alien.networking.util.FatalPackage;
@@ -25,7 +26,7 @@ abstract public class Client {
     final Socket socket;
 
     /**
-     * The {@link Thread} that make sure that the received messages get handed in {@link #messageReceive(Serializable, boolean)}
+     * The {@link Thread} that make sure that the received messages get handed in {@link #messageReceive(Serializable, boolean, boolean)}
      */
     private final MessageReceiveThread messageReceiveThread;
 
@@ -95,11 +96,12 @@ abstract public class Client {
     }
 
     /**
-     * {@link #messageReceive(Serializable, boolean)} gets called when {@link #messageReceiveThread} receives a new message
+     * {@link #messageReceive(Serializable, boolean, boolean)} gets called when {@link #messageReceiveThread} receives a new message
      * @param message A class that needs to implument {@link Serializable} to contain some sort of data. see examples package
      * @param fatal If this is {@code true} then the connection will be closed directly after this method is complete. If its {@code true} then the message will be a {@link FatalPackage} and it will contain a {@link FatalPackage#reason} and {@link FatalPackage#error} that will describe the issue
+     * @param exit If this is true then the server is requesting this connection to be closed. This is followed by a region but no mather what the socket will be closed, reconnection can be done.
      */
-    public abstract void messageReceive(Serializable message, boolean fatal);
+    public abstract void messageReceive(Serializable message, boolean fatal, boolean exit);
 
     /**
      * {@link #connected()} will be called when it's done with the initial handshake hear its possible to do some second hand handshake to confirm more information
@@ -116,7 +118,16 @@ abstract public class Client {
     }
 
     /**
-     * The {@link MessageReceiveThread} is a {@link Thread} that will make sure all receive packages will be sent to {@link #messageReceive(Serializable, boolean)}
+     * Sends an exit package to close the connection to the server
+     * @param reason the reason way the connection was ended.
+     * @throws IOException If the {@link Socket#getOutputStream()}s {@link OutputStream} throws a IOException
+     */
+    public void end(String reason) throws IOException {
+        out.writeObject(new ExitPackage(reason));
+    }
+
+    /**
+     * The {@link MessageReceiveThread} is a {@link Thread} that will make sure all receive packages will be sent to {@link #messageReceive(Serializable, boolean, boolean)}
      * @author Zacharias Zellén
      */
     private class MessageReceiveThread extends Thread {
@@ -132,15 +143,19 @@ abstract public class Client {
                     try{
                         Serializable message = (Serializable) in.readObject();
                         boolean fatal = false;
+                        boolean exit = false;
                         if(message instanceof FatalPackage){
                             fatal = true;
                         }
-                        messageReceive(message, fatal);
+                        if(message instanceof ExitPackage) {
+                            exit = true;
+                        }
+                        messageReceive(message, fatal, exit);
                     }catch (IOException ignored){
                         if(socket.isClosed()){
                             Logger.warn(getClass(), "IOException accused");
                             Logger.exception(getClass(), ignored.getStackTrace());
-                            messageReceive(new FatalPackage("Connected closed, assuming lost of connection to client", "Connection closed"), true);
+                            messageReceive(new FatalPackage("Connected closed, assuming lost of connection to client", "Connection closed"), true, false);
                         }
                     } catch (ClassNotFoundException e) {
                         throw new RuntimeException(e);
@@ -149,7 +164,7 @@ abstract public class Client {
             }catch (IOException ignored){
                 Logger.warn(getClass(), "IOException accused");
                 Logger.exception(getClass(), ignored.getStackTrace());
-                messageReceive(new FatalPackage("Failed to create a ObjectInputStream instance of the sockets InputStream instance", "Socket closed?"), true);
+                messageReceive(new FatalPackage("Failed to create a ObjectInputStream instance of the sockets InputStream instance", "Socket closed?"), true, false);
             }
         }
     }

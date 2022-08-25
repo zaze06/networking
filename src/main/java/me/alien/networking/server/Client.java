@@ -1,5 +1,6 @@
 package me.alien.networking.server;
 
+import me.alien.networking.util.ExitPackage;
 import me.alien.networking.util.Logger;
 import me.alien.networking.util.FatalPackage;
 
@@ -20,7 +21,7 @@ public class Client {
      */
     private final Server server;
     /**
-     * {@link MessageReceiveThread} is a {@link Thread} that will send the recived messages to {@link Server#clientMessage(Client, Serializable, boolean)}
+     * {@link MessageReceiveThread} is a {@link Thread} that will send the recived messages to {@link Server#clientMessage(Client, Serializable, boolean, boolean)}
      */
     private final MessageReceiveThread messageReciveThread;
     /**
@@ -55,7 +56,16 @@ public class Client {
     }
 
     /**
-     * {@link MessageReceiveThread} is the {@link Thread} that is responsible for sending the received message to {@link Server#clientMessage(Client, Serializable, boolean)}
+     * Sends an exit package to close the connection to the server
+     * @param reason the reason way the connection was ended.
+     * @throws IOException If the {@link Socket#getOutputStream()}s {@link OutputStream} throws a IOException
+     */
+    public void end(String reason) throws IOException {
+        out.writeObject(new ExitPackage(reason));
+    }
+
+    /**
+     * {@link MessageReceiveThread} is the {@link Thread} that is responsible for sending the received message to {@link Server#clientMessage(Client, Serializable, boolean, boolean)}
      * @author Zacharias Zellén
      */
     private class MessageReceiveThread extends Thread {
@@ -70,15 +80,23 @@ public class Client {
                     try{
                         Serializable message = (Serializable) in.readObject();
                         boolean fatal = false;
+                        boolean exit = true;
                         if(message instanceof FatalPackage){
                             fatal = true;
                         }
-                        server.clientMessage(Client.this, message, fatal);
+                        if(message instanceof ExitPackage){
+                            exit = true;
+                        }
+                        server.clientMessage(Client.this, message, fatal, exit);
+                        if(fatal){
+                            socket.close();
+                            server.close(Client.this);
+                        }
                     }catch (IOException ignored){
                         if(socket.isClosed()){
                             Logger.warn(getClass(), "IOException accused");
                             Logger.exception(getClass(), ignored.getStackTrace());
-                            server.clientMessage(Client.this, new FatalPackage("Connected closed, assuming lost of connection to client", "connection lost"), true);
+                            server.clientMessage(Client.this, new FatalPackage("Connected closed, assuming lost of connection to client", "connection lost"), true, false);
                         }
                     } catch (ClassNotFoundException e) {
                         throw new RuntimeException(e);
@@ -87,7 +105,7 @@ public class Client {
             }catch (IOException ignored){
                 Logger.warn(getClass(), "IOException accused");
                 Logger.exception(getClass(), ignored.getStackTrace());
-                server.clientMessage(Client.this, new FatalPackage("Failed to create a ObjectOutputStream instance of the sockets InputStream instance", "Socket not opened?"), true);
+                server.clientMessage(Client.this, new FatalPackage("Failed to create a ObjectOutputStream instance of the sockets InputStream instance", "Socket not opened?"), true, false);
             }
         }
     }

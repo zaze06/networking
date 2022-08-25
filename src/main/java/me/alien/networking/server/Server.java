@@ -22,7 +22,7 @@ abstract public class Server {
      */
     final ServerSocket server;
     /**
-     * The accept thread for clients. This will handle the initial handshake
+     * The acceptation thread for clients. This will handle the initial handshake
      */
     private final ClientAcceptThread clientAcceptThread;
     /**
@@ -91,8 +91,18 @@ abstract public class Server {
      * clientMessage gets called when the server receives a message from a client.
      * @param client The client that send the message.
      * @param message The message that was received.
-     * @param fatal if this was a fatal message, meaning that the client experienced a fatal issue and needs to have the connection closed.
+     * @param fatal if this is a fatal message, meaning that the client experienced a fatal issue and needs to have the connection closed.
      *              If fatal is true then the connection will be closed afterwords.
+     * @param exit if this is an exit message, meaning that the client will exit after and the connection will be closed, this is the last message.
+     *             This message will contain a reason of way the connection should be closed.
      */
-    public abstract void clientMessage(Client client, Serializable message, boolean fatal);
+    public abstract void clientMessage(Client client, Serializable message, boolean fatal, boolean exit);
+
+    /**
+     * Removes a {@link Client} from the servers {@link Server#clients} list.
+     * @param client the {@link Client} that should be removed.
+     */
+    public void close(Client client) {
+        clients.remove(client);
+    }
 }
