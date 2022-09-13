@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<script>
+  var getJSON = function(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'json';
+    xhr.onload = function() {   
+      var status = xhr.status;
+      if (status === 200) {
+        callback(null, xhr.response);
+      } else {
+        callback(status, xhr.response);
+      }
+    };
+    xhr.send();
+  };
+  const url = "https://zaze06.github.io/networking/versions.json";
+  var json_raw = "";
+  getJSON(url, function(err, data) {
+        if (err !== null) {
+          alert('Something went wrong: ' + err);
+        } else {
+          json_raw = data;
+          console.info(json_raw);
+          var array = [], i = 0;
+          JSON.parse(JSON.stringify(json_raw), (key1, value1) => {
+              array[i] = {key:key1, value:value1};
+              i++;
+          });
+          var object = array[0];
+          array.forEach(Element => {
+            if(parseFloat(Element.key) > parseFloat(object.key)){
+              object = Element;
+            }
+          })
+          console.info(object);
+          window.location.href = object.value;
+          
+          //console.info(data);
+        }
+    });
+</script>
+</body>
+</html>
