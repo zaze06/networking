@@ -19,7 +19,11 @@ public class testClient extends Client {
 
     @Override
     public void connected() {
-
+        try {
+            send(new MessagePackage("Hello"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void main(String[] args) throws IOException {

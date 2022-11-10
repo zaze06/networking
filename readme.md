@@ -17,3 +17,4 @@
 - If your build system or this dodent work follow the instructions on [jitpack](https://jitpack.io/#zaze06/networking)
 
 #### Javadoc can be found at [hear](https://zaze06.github.io/networking/) or in [docs](https://github.com/zaze06/networking/tree/master/docs) folder
+#### Latest javadoc can be found at [latest](https://zaze06.github.io/networking/leatest.html)

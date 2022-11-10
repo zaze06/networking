@@ -1,6 +1,7 @@
 import examples.MessagePackage;
 import me.alien.networking.server.Client;
 import me.alien.networking.server.Server;
+import me.alien.networking.util.Logger;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -22,7 +23,9 @@ public class testserver extends Server {
 
     @Override
     public void clientMessage(Client client, Serializable message, boolean fatal, boolean exit) {
-
+        if(message instanceof MessagePackage msg) {
+            Logger.info(getClass(), msg.getMessage());
+        }
     }
 
     public static void main(String[] args) throws IOException {

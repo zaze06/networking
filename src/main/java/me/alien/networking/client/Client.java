@@ -80,6 +80,7 @@ abstract public class Client {
             socket.close();
         }
 
+        this.out = new ObjectOutputStream(out);
         messageReceiveThread.start();
 
         connected();
@@ -151,19 +152,20 @@ abstract public class Client {
                             exit = true;
                         }
                         messageReceive(message, fatal, exit);
-                    }catch (IOException ignored){
+                    }catch (IOException ioException){
                         if(socket.isClosed()){
                             Logger.warn(getClass(), "IOException accused");
-                            Logger.exception(getClass(), ignored.getStackTrace());
-                            messageReceive(new FatalPackage("Connected closed, assuming lost of connection to client", "Connection closed"), true, false);
+                            Logger.exception(getClass(), ioException.getStackTrace());
+                            messageReceive(new FatalPackage("Connected closed, assuming lost of connection to server", "Connection closed"), true, false);
+                            return;
                         }
                     } catch (ClassNotFoundException e) {
                         throw new RuntimeException(e);
                     }
                 }
-            }catch (IOException ignored){
+            }catch (IOException ioException){
                 Logger.warn(getClass(), "IOException accused");
-                Logger.exception(getClass(), ignored.getStackTrace());
+                Logger.exception(getClass(), ioException.getStackTrace());
                 messageReceive(new FatalPackage("Failed to create a ObjectInputStream instance of the sockets InputStream instance", "Socket closed?"), true, false);
             }
         }
