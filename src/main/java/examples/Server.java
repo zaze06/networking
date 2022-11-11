@@ -30,7 +30,8 @@ public class Server extends me.alien.networking.server.Server {
 
     @Override
     public void clientMessage(Client client, Serializable message, boolean fatal, boolean exit) {
-        if(message instanceof MessagePackage msg){
+        if(message instanceof MessagePackage){
+            MessagePackage msg = (MessagePackage) message;
             Logger.info("example server", msg.getMessage());
         }
     }
