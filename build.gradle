@@ -6,6 +6,18 @@ plugins {
 group 'me.alien.networking'
 version '4.1'
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = 'me.alien.networking'
+            artifactId = 'library'
+            version = '4.1'
+
+            from components.java
+        }
+    }
+}
+
 repositories {
     mavenCentral()
 }
