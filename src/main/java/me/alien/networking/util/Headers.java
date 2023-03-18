@@ -29,7 +29,7 @@ public enum Headers {
      */
     ERROR('~');
     /**
-     * A chat that is responsible for the {@link Headers} indicator
+     * A char that is responsible for the {@link Headers} indicator
      */
     final char header;
 

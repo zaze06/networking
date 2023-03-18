@@ -28,7 +28,7 @@ abstract public class Server {
     /**
      * A list of all the connected {@link Client}s
      */
-    final ArrayList<Client> clients;
+    protected final ArrayList<Client> clients;
     /**
      * The port that the server is listening too
      */
