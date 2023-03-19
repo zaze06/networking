@@ -21,4 +21,12 @@ public class ExitPackage implements Serializable {
     public ExitPackage(String reason) {
         this.reason = reason;
     }
+
+    /**
+     * Retries the reason for the exit.
+     * @return the reason for the exit
+     */
+    public String getReason() {
+        return reason;
+    }
 }

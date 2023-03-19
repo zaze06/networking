@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'me.alien.networking'
-version '4.1'
+version '4.1.1-1'
 
 publishing {
     publications {
@@ -23,5 +23,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.json:json:20220924'
+    implementation 'org.json:json:20230227'
 }
